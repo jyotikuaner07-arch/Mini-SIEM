@@ -140,3 +140,37 @@ Session: 2026-02-24T22:36:42.870774
 [CRITICAL] 2026-02-24 22:36:42 | Rule: THREAT_INTEL_MATCH | Score: 15
   IP 198.51.100.7 matched threat intelligence list [exact match] — user: unknownuser, event: FAILED_LOGIN
 
+
+============================================================
+Session: 2026-02-25T17:22:57.533350
+============================================================
+[CRITICAL] 2026-02-24 18:45:57 | Rule: THREAT_INTEL_MATCH | Score: 10
+  IP 203.0.113.42 matched threat intelligence list [exact match] — user: root, event: SUCCESSFUL_LOGIN
+
+[MEDIUM] 2026-02-24 23:50:57 | Rule: NEW_IP_LOGIN | Score: 3
+  Successful login from previously unseen IP: 10.0.0.5 (user: bob)
+
+[MEDIUM] 2026-02-25 03:33:57 | Rule: NEW_IP_LOGIN | Score: 3
+  Successful login from previously unseen IP: 192.168.1.10 (user: root)
+
+[HIGH] 2026-02-25 17:07:57 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: jdoe, ip: 10.0.0.5, status: SUCCESS
+
+[MEDIUM] 2026-02-25 17:17:57 | Rule: NEW_IP_LOGIN | Score: 6
+  Successful login from previously unseen IP: 198.51.100.7 (user: alice)
+
+[CRITICAL] 2026-02-25 17:17:57 | Rule: THREAT_INTEL_MATCH | Score: 16
+  IP 198.51.100.7 matched threat intelligence list [exact match] — user: alice, event: SUCCESSFUL_LOGIN
+
+[HIGH] 2026-02-25 17:19:57 | Rule: BRUTE_FORCE | Score: 80
+  8 failed login attempts in 120s from '203.0.113.42'
+
+[HIGH] 2026-02-25 17:22:02 | Rule: BRUTE_FORCE | Score: 78
+  6 failed login attempts in 120s from '198.51.100.7'
+
+[MEDIUM] 2026-02-25 17:22:02 | Rule: ERROR_SPIKE | Score: 162
+  12 errors/failures detected in 60s
+
+[CRITICAL] 2026-02-25 17:22:57 | Rule: CRITICAL_RISK_THRESHOLD | Score: 279
+  Aggregate risk score 279 exceeds critical threshold 20. Immediate investigation recommended.
+

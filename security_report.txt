@@ -1,7 +1,7 @@
 ╔══════════════════════════════════════════════════════════╗
 ║          MINI SIEM — DAILY SECURITY REPORT              ║
 ╚══════════════════════════════════════════════════════════╝
-  Generated : 2026-02-24T09:27:54.289559
+  Generated : 2026-02-25T17:22:57.539519
   Period    : Last 24 hours
 
 ────────────────────────────────────────────────────────────
@@ -11,64 +11,76 @@
   Failed Login Attempts   : 20
   Successful Logins       : 7
   Privilege Escalations   : 1
-  High-Risk Individual Evts: 20
-  Total System Risk Score : 196
+  High-Risk Individual Evts: 22
+  Total System Risk Score : 279
 
 ────────────────────────────────────────────────────────────
   ALERTS GENERATED
 ────────────────────────────────────────────────────────────
-  Total Alerts  : 5
-  ├─ CRITICAL   : 1
-  ├─ HIGH       : 2
-  ├─ MEDIUM     : 2
+  Total Alerts  : 10
+  ├─ CRITICAL   : 3
+  ├─ HIGH       : 3
+  ├─ MEDIUM     : 4
   └─ LOW        : 0
 
 ────────────────────────────────────────────────────────────
   TOP SUSPICIOUS IPs
 ────────────────────────────────────────────────────────────
-  203.0.113.42          9 failed attempt(s)
-  192.168.1.10          4 failed attempt(s)
-  10.0.0.5              4 failed attempt(s)
-  198.51.100.7          3 failed attempt(s)
+  203.0.113.42          11 failed attempt(s)
+  198.51.100.7          6 failed attempt(s)
+  192.168.1.10          3 failed attempt(s)
 
 ────────────────────────────────────────────────────────────
   TOP TARGETED USERS
 ────────────────────────────────────────────────────────────
-  admin                 9 failed attempt(s)
-  unknownuser           3 failed attempt(s)
-  jdoe                  3 failed attempt(s)
-  bob                   2 failed attempt(s)
-  root                  2 failed attempt(s)
-  alice                 1 failed attempt(s)
+  admin                 10 failed attempt(s)
+  bob                   5 failed attempt(s)
+  alice                 3 failed attempt(s)
+  root                  1 failed attempt(s)
+  unknownuser           1 failed attempt(s)
 
 ────────────────────────────────────────────────────────────
   ALERT DETAILS
 ────────────────────────────────────────────────────────────
 
-  [CRITICAL] CRITICAL_RISK_THRESHOLD  |  2026-02-24 09:27:54  |  Score: 196
-  → Aggregate risk score 196 exceeds critical threshold 20. Immediate investigation recommended.
+  [CRITICAL] THREAT_INTEL_MATCH  |  2026-02-24 18:45:57  |  Score: 10
+  → IP 203.0.113.42 matched threat intelligence list [exact match] — user: root, event: SUCCESSFUL_LOGIN
 
-  [HIGH] PRIVILEGE_ESCALATION  |  2026-02-24 09:12:54  |  Score: 5
+  [CRITICAL] THREAT_INTEL_MATCH  |  2026-02-25 17:17:57  |  Score: 16
+  → IP 198.51.100.7 matched threat intelligence list [exact match] — user: alice, event: SUCCESSFUL_LOGIN
+
+  [CRITICAL] CRITICAL_RISK_THRESHOLD  |  2026-02-25 17:22:57  |  Score: 279
+  → Aggregate risk score 279 exceeds critical threshold 20. Immediate investigation recommended.
+
+  [HIGH] PRIVILEGE_ESCALATION  |  2026-02-25 17:07:57  |  Score: 5
   → Privilege escalation detected — user: jdoe, ip: 10.0.0.5, status: SUCCESS
 
-  [HIGH] BRUTE_FORCE  |  2026-02-24 09:24:54  |  Score: 80
+  [HIGH] BRUTE_FORCE  |  2026-02-25 17:19:57  |  Score: 80
   → 8 failed login attempts in 120s from '203.0.113.42'
 
-  [MEDIUM] NEW_IP_LOGIN  |  2026-02-24 09:22:54  |  Score: 6
+  [HIGH] BRUTE_FORCE  |  2026-02-25 17:22:02  |  Score: 78
+  → 6 failed login attempts in 120s from '198.51.100.7'
+
+  [MEDIUM] NEW_IP_LOGIN  |  2026-02-24 23:50:57  |  Score: 3
+  → Successful login from previously unseen IP: 10.0.0.5 (user: bob)
+
+  [MEDIUM] NEW_IP_LOGIN  |  2026-02-25 03:33:57  |  Score: 3
+  → Successful login from previously unseen IP: 192.168.1.10 (user: root)
+
+  [MEDIUM] NEW_IP_LOGIN  |  2026-02-25 17:17:57  |  Score: 6
   → Successful login from previously unseen IP: 198.51.100.7 (user: alice)
 
-  [MEDIUM] ERROR_SPIKE  |  2026-02-24 09:26:59  |  Score: 105
+  [MEDIUM] ERROR_SPIKE  |  2026-02-25 17:22:02  |  Score: 162
   → 12 errors/failures detected in 60s
 
 ────────────────────────────────────────────────────────────
   HOURLY ACTIVITY
 ────────────────────────────────────────────────────────────
-  2026-02-23 09:00  █ 1
-  2026-02-23 13:00  █ 1
-  2026-02-23 15:00  █ 1
-  2026-02-23 22:00  █ 1
-  2026-02-24 07:00  █ 1
-  2026-02-24 09:00  ██████████████████████ 22
+  2026-02-24 18:00  █ 1
+  2026-02-24 23:00  ██ 2
+  2026-02-25 03:00  █ 1
+  2026-02-25 14:00  █ 1
+  2026-02-25 17:00  ██████████████████████ 22
 
 ════════════════════════════════════════════════════════════
   END OF REPORT
