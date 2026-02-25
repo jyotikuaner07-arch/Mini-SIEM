@@ -1,0 +1,75 @@
+╔══════════════════════════════════════════════════════════╗
+║          MINI SIEM — DAILY SECURITY REPORT              ║
+╚══════════════════════════════════════════════════════════╝
+  Generated : 2026-02-24T09:27:54.289559
+  Period    : Last 24 hours
+
+────────────────────────────────────────────────────────────
+  EXECUTIVE SUMMARY
+────────────────────────────────────────────────────────────
+  Total Events Collected  : 27
+  Failed Login Attempts   : 20
+  Successful Logins       : 7
+  Privilege Escalations   : 1
+  High-Risk Individual Evts: 20
+  Total System Risk Score : 196
+
+────────────────────────────────────────────────────────────
+  ALERTS GENERATED
+────────────────────────────────────────────────────────────
+  Total Alerts  : 5
+  ├─ CRITICAL   : 1
+  ├─ HIGH       : 2
+  ├─ MEDIUM     : 2
+  └─ LOW        : 0
+
+────────────────────────────────────────────────────────────
+  TOP SUSPICIOUS IPs
+────────────────────────────────────────────────────────────
+  203.0.113.42          9 failed attempt(s)
+  192.168.1.10          4 failed attempt(s)
+  10.0.0.5              4 failed attempt(s)
+  198.51.100.7          3 failed attempt(s)
+
+────────────────────────────────────────────────────────────
+  TOP TARGETED USERS
+────────────────────────────────────────────────────────────
+  admin                 9 failed attempt(s)
+  unknownuser           3 failed attempt(s)
+  jdoe                  3 failed attempt(s)
+  bob                   2 failed attempt(s)
+  root                  2 failed attempt(s)
+  alice                 1 failed attempt(s)
+
+────────────────────────────────────────────────────────────
+  ALERT DETAILS
+────────────────────────────────────────────────────────────
+
+  [CRITICAL] CRITICAL_RISK_THRESHOLD  |  2026-02-24 09:27:54  |  Score: 196
+  → Aggregate risk score 196 exceeds critical threshold 20. Immediate investigation recommended.
+
+  [HIGH] PRIVILEGE_ESCALATION  |  2026-02-24 09:12:54  |  Score: 5
+  → Privilege escalation detected — user: jdoe, ip: 10.0.0.5, status: SUCCESS
+
+  [HIGH] BRUTE_FORCE  |  2026-02-24 09:24:54  |  Score: 80
+  → 8 failed login attempts in 120s from '203.0.113.42'
+
+  [MEDIUM] NEW_IP_LOGIN  |  2026-02-24 09:22:54  |  Score: 6
+  → Successful login from previously unseen IP: 198.51.100.7 (user: alice)
+
+  [MEDIUM] ERROR_SPIKE  |  2026-02-24 09:26:59  |  Score: 105
+  → 12 errors/failures detected in 60s
+
+────────────────────────────────────────────────────────────
+  HOURLY ACTIVITY
+────────────────────────────────────────────────────────────
+  2026-02-23 09:00  █ 1
+  2026-02-23 13:00  █ 1
+  2026-02-23 15:00  █ 1
+  2026-02-23 22:00  █ 1
+  2026-02-24 07:00  █ 1
+  2026-02-24 09:00  ██████████████████████ 22
+
+════════════════════════════════════════════════════════════
+  END OF REPORT
+════════════════════════════════════════════════════════════

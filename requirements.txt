@@ -1,0 +1,19 @@
+# ══════════════════════════════════════════════════════
+# Mini SIEM — Python Dependencies
+# Install with: pip install -r requirements.txt
+# ══════════════════════════════════════════════════════
+
+# Core (required)
+click>=8.1.0          # Professional CLI framework
+colorama>=0.4.6       # Colored terminal output
+
+# Web Dashboard
+flask>=3.0.0          # Web framework
+
+# Testing
+pytest>=7.4.0         # Test runner
+pytest-cov>=4.1.0     # Coverage reports
+
+# All other modules used (sqlite3, re, datetime, subprocess,
+# smtplib, csv, collections, pathlib, logging, json, time,
+# functools, platform, os) are Python standard library — no install needed.

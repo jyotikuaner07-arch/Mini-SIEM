@@ -1,0 +1,6 @@
+timestamp,severity,rule,risk_score,description,entity
+2026-02-24T09:12:54.261088,HIGH,PRIVILEGE_ESCALATION,5,"Privilege escalation detected — user: jdoe, ip: 10.0.0.5, status: SUCCESS",jdoe
+2026-02-24T09:22:54.261088,MEDIUM,NEW_IP_LOGIN,6,Successful login from previously unseen IP: 198.51.100.7 (user: alice),198.51.100.7
+2026-02-24T09:24:54.261088,HIGH,BRUTE_FORCE,80,8 failed login attempts in 120s from '203.0.113.42',203.0.113.42
+2026-02-24T09:26:59.261088,MEDIUM,ERROR_SPIKE,105,12 errors/failures detected in 60s,global
+2026-02-24T09:27:54.261088,CRITICAL,CRITICAL_RISK_THRESHOLD,196,Aggregate risk score 196 exceeds critical threshold 20. Immediate investigation recommended.,system

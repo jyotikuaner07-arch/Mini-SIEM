@@ -1,0 +1,22 @@
+# ══════════════════════════════════════════════════════
+# Mini SIEM — Threat Intelligence List
+# ══════════════════════════════════════════════════════
+# Format: one IP or CIDR block per line
+# Lines starting with # are comments
+#
+# In production, replace this with feeds from:
+#   - AbuseIPDB  (https://www.abuseipdb.com)
+#   - Emerging Threats (https://rules.emergingthreats.net)
+#   - Spamhaus DROP list
+# ══════════════════════════════════════════════════════
+
+# ── Known bad IPs (demo / RFC 5737 test addresses) ──
+203.0.113.42       # known scanner
+203.0.113.99       # brute-force bot
+198.51.100.7       # credential-stuffing origin
+198.51.100.200     # tor exit node (example)
+192.0.2.100        # test malicious IP
+
+# ── Malicious CIDR blocks ──
+203.0.113.0/24     # entire test-net block (demo)
+# 185.220.101.0/24  # real tor exit range (uncomment to enable)

@@ -1,0 +1,16 @@
+2026-02-24 22:36:22 | INFO     | mini_siem | [STARTUP] SIEM started | mode=demo | hours_back=24
+2026-02-24 22:36:22 | CRITICAL | mini_siem | [ALERT] rule=THREAT_INTEL_MATCH | severity=CRITICAL | entity=203.0.113.42 | score=10
+2026-02-24 22:36:22 | WARNING  | mini_siem | [ALERT] rule=NEW_IP_LOGIN | severity=MEDIUM | entity=192.168.1.10 | score=3
+2026-02-24 22:36:22 | ERROR    | mini_siem | [ALERT] rule=PRIVILEGE_ESCALATION | severity=HIGH | entity=jdoe | score=5
+2026-02-24 22:36:22 | WARNING  | mini_siem | [ALERT] rule=NEW_IP_LOGIN | severity=MEDIUM | entity=198.51.100.7 | score=6
+2026-02-24 22:36:22 | CRITICAL | mini_siem | [ALERT] rule=THREAT_INTEL_MATCH | severity=CRITICAL | entity=198.51.100.7 | score=16
+2026-02-24 22:36:22 | ERROR    | mini_siem | [ALERT] rule=BRUTE_FORCE | severity=HIGH | entity=203.0.113.42 | score=80
+2026-02-24 22:36:22 | WARNING  | mini_siem | [ALERT] rule=ERROR_SPIKE | severity=MEDIUM | entity=global | score=142
+2026-02-24 22:36:22 | ERROR    | mini_siem | [ALERT] rule=BRUTE_FORCE | severity=HIGH | entity=10.0.0.5 | score=50
+2026-02-24 22:36:22 | CRITICAL | mini_siem | [ALERT] rule=CRITICAL_RISK_THRESHOLD | severity=CRITICAL | entity=system | score=256
+2026-02-24 22:36:22 | INFO     | mini_siem | [LIVE] cycle=1 | new_events=27 | new_alerts=9
+2026-02-24 22:36:32 | CRITICAL | mini_siem | [ALERT] rule=THREAT_INTEL_MATCH | severity=CRITICAL | entity=198.51.100.7 | score=15
+2026-02-24 22:36:32 | CRITICAL | mini_siem | [ALERT] rule=CRITICAL_RISK_THRESHOLD | severity=CRITICAL | entity=system | score=22
+2026-02-24 22:36:32 | INFO     | mini_siem | [LIVE] cycle=2 | new_events=3 | new_alerts=2
+2026-02-24 22:36:42 | CRITICAL | mini_siem | [ALERT] rule=THREAT_INTEL_MATCH | severity=CRITICAL | entity=198.51.100.7 | score=15
+2026-02-24 22:36:42 | INFO     | mini_siem | [LIVE] cycle=3 | new_events=3 | new_alerts=1
