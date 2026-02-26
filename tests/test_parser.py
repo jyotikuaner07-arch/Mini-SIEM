@@ -13,7 +13,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from core.parser import (
+from mini_siem.core.parser import (
     parse_log_entry, parse_all,
     _parse_timestamp, _validate_ip, _sanitize_string, is_internal_ip,
 )

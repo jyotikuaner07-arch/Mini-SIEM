@@ -9,7 +9,7 @@ import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from pathlib import Path
-from core.detector import severity_order
+from mini_siem.core.detector import severity_order
 
 # ── Try to import colorama; graceful fallback if not installed ──
 try:

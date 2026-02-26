@@ -7,7 +7,7 @@ import csv
 import datetime
 from collections import Counter, defaultdict
 from pathlib import Path
-from core.detector import severity_order
+from mini_siem.core.detector import severity_order
 
 
 # ──────────────────────────────────────────────

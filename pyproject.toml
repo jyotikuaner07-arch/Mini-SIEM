@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mini-siem"
+version = "1.0.0"
+description = "A pip-installable cross-platform SIEM CLI tool with real-time threat detection"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+
+authors = [
+    { name = "Jyoti Kuaner", email = "your-email@example.com" }
+]
+
+keywords = [
+    "siem", "security", "monitoring", "threat-detection",
+    "log-analysis", "cli", "cybersecurity", "macos"
+]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: System :: Logging",
+    "Topic :: System :: Monitoring",
+]
+
+# ── Runtime dependencies ──
+# These are installed automatically when someone does:  pip install mini-siem
+dependencies = [
+    "click>=8.1.0",
+    "colorama>=0.4.6",
+    "flask>=3.0.0",
+]
+
+# ── Optional dependencies ──
+# Install with:  pip install mini-siem[dev]
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+# ── THIS IS THE KEY LINE ──
+# When user types 'mini-siem', Python runs the cli() function
+# inside mini_siem/main.py
+[project.scripts]
+mini-siem = "mini_siem.main:cli"
+
+[project.urls]
+Homepage   = "https://github.com/yourusername/mini-siem"
+Repository = "https://github.com/yourusername/mini-siem"
+Issues     = "https://github.com/yourusername/mini-siem/issues"
+
+# ── Setuptools config ──
+# Tells setuptools to automatically find all packages (mini_siem, mini_siem.core)
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mini_siem*"]
+
+# ── Pytest config ──
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]

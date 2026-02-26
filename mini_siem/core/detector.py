@@ -5,7 +5,7 @@ Analyses parsed events and emits structured alerts.
 
 import datetime
 from collections import defaultdict
-from core.parser import is_internal_ip
+from mini_siem.core.parser import is_internal_ip
 
 # ──────────────────────────────────────────────
 # RISK SCORES (points per event type)
@@ -88,7 +88,7 @@ def detect(events: list[dict], known_ips: set[str] | None = None, use_threat_int
 
     # ── Rule 5: Threat Intelligence Match ──
     try:
-        from core.threat_intel import check_events_against_intel
+        from mini_siem.core.threat_intel import check_events_against_intel
         alerts.extend(check_events_against_intel(events))
     except Exception:
         pass  # threat intel is optional — never crash the pipeline
