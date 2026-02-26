@@ -278,9 +278,9 @@ Your username is added automatically when you run `mini-siem init`.
 
 ```json
 {
-  "trusted_users": ["jyotikuaner", "root"],
-  "trusted_ips":   ["127.0.0.1", "::1", "192.168.1.5"],
-  "trusted_processes": ["sudo", "python3", "venv"]
+  "trusted_users": [],
+  "trusted_ips": ["127.0.0.1", "::1"],
+  "trusted_processes": []
 }
 ```
 
