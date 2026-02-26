@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Optional
 
 # ── Where the database file lives on disk ──
-DB_PATH = Path(__file__).parent / "data" / "siem.db"
+DB_PATH = Path(__file__).parent.parent / "data" / "siem.db"
 
 
 # ════════════════════════════════════════════════════════

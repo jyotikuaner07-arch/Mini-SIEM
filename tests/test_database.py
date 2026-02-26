@@ -24,14 +24,14 @@ def temp_db(tmp_path):
     temp_db_path = tmp_path / "test_siem.db"
     (tmp_path / "data").mkdir(exist_ok=True)
     with patch("database.DB_PATH", temp_db_path):
-        import database
+        import core.database as database
         database.DB_PATH = temp_db_path
         database.DB_PATH.parent.mkdir(parents=True, exist_ok=True)
         database.init_db()
         yield temp_db_path
 
 
-import database
+import core.database as database
 
 
 def _make_event(offset_minutes=0) -> dict:

@@ -5,7 +5,7 @@ Analyses parsed events and emits structured alerts.
 
 import datetime
 from collections import defaultdict
-from parser import is_internal_ip
+from core.parser import is_internal_ip
 
 # ──────────────────────────────────────────────
 # RISK SCORES (points per event type)
@@ -88,7 +88,7 @@ def detect(events: list[dict], known_ips: set[str] | None = None, use_threat_int
 
     # ── Rule 5: Threat Intelligence Match ──
     try:
-        from threat_intel import check_events_against_intel
+        from core.threat_intel import check_events_against_intel
         alerts.extend(check_events_against_intel(events))
     except Exception:
         pass  # threat intel is optional — never crash the pipeline
@@ -238,18 +238,33 @@ def _rule_error_spike(events: list[dict]) -> list[dict]:
 
 
 def _rule_critical_risk(events: list[dict]) -> list[dict]:
-    """Fire a CRITICAL alert if total accumulated risk score exceeds threshold."""
-    total = sum(e["risk_score"] for e in events)
+    """
+    Fire CRITICAL only when genuine threat risk exceeds threshold.
+    Excludes events that came from whitelisted/local sudo activity
+    (those have status=INFO and no source IP).
+    """
+    # Only count events that look like real external threats
+    genuine_events = [
+        e for e in events
+        if not (
+            e.get("status") == "INFO"
+            and not e.get("source_ip")
+            and e.get("event_type") == "PRIVILEGE_ESCALATION"
+        )
+    ]
+
+    total = sum(e["risk_score"] for e in genuine_events)
+
     if total >= CRITICAL_THRESHOLD:
         return [{
             "rule":        "CRITICAL_RISK_THRESHOLD",
             "severity":    "CRITICAL",
             "timestamp":   events[-1]["timestamp"] if events else datetime.datetime.now(),
             "description": (
-                f"Aggregate risk score {total} exceeds critical threshold {CRITICAL_THRESHOLD}. "
-                "Immediate investigation recommended."
+                f"Genuine threat risk score {total} exceeds critical threshold "
+                f"{CRITICAL_THRESHOLD}. Immediate investigation recommended."
             ),
-            "events":      events,
+            "events":      genuine_events,
             "risk_score":  total,
             "entity":      "system",
         }]

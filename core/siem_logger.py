@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 # ── Log file location ──
-LOG_DIR  = Path(__file__).parent / "logs"
+LOG_DIR  = Path(__file__).parent.parent / "logs"
 LOG_FILE = LOG_DIR / "siem.log"
 
 # ── Module-level logger — imported by all other modules ──

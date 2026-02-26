@@ -14,7 +14,7 @@ import re
 from pathlib import Path
 
 # ── Where the threat intel file lives ──
-INTEL_FILE = Path(__file__).parent / "data" / "threat_intel.txt"
+INTEL_FILE = Path(__file__).parent.parent / "data" / "threat_intel.txt"
 
 # ── In-memory set — loaded once, used for all lookups ──
 _MALICIOUS_IPS:  set[str] = set()

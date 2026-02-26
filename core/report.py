@@ -7,7 +7,7 @@ import csv
 import datetime
 from collections import Counter, defaultdict
 from pathlib import Path
-from detector import severity_order
+from core.detector import severity_order
 
 
 # ──────────────────────────────────────────────

@@ -543,7 +543,7 @@ def _build_context(events: list[dict], alerts: list[dict]) -> dict:
 
     # ── SIEM internal logs ──
     try:
-        from siem_logger import get_recent_log_lines
+        from core.siem_logger import get_recent_log_lines
         siem_logs = [l.rstrip() for l in get_recent_log_lines(20)]
     except Exception:
         siem_logs = []
@@ -655,7 +655,7 @@ def run_dashboard(events: list[dict], alerts: list[dict],
     @login_required
     def api_stats():
         try:
-            from database import get_db_stats
+            from core.database import get_db_stats
             return jsonify(get_db_stats())
         except Exception as exc:
             return jsonify({"error": str(exc)}), 500
@@ -670,8 +670,8 @@ def run_dashboard(events: list[dict], alerts: list[dict],
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, str(Path(__file__).parent))
-    from collector import generate_demo_logs
-    from parser import parse_all
-    from detector import detect
+    from core.collector import generate_demo_logs
+    from core.parser import parse_all
+    from core.detector import detect
     events, alerts = detect(parse_all(generate_demo_logs()))
     run_dashboard(events, alerts)

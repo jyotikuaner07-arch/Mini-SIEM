@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import pytest
-from detector import (
+from core.detector import (
     detect, _rule_brute_force, _rule_new_ip,
     _rule_privilege_escalation, _rule_error_spike,
     _rule_critical_risk, _deduplicate_alerts,

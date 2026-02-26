@@ -132,11 +132,11 @@ def collect_macos_logs(hours_back: int = 24) -> List[Dict]:
     ]
 
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        for line in result.stdout.splitlines():
-            parsed = _parse_macos_log_line(line)
-            if parsed:
-                events.append(parsed)
+        with subprocess.Popen(cmd, stdout=subprocess.PIPE, text=True) as proc:
+            for line in proc.stdout:
+                parsed = _parse_macos_log_line(line)
+                if parsed:
+                    events.append(parsed)
     except FileNotFoundError:
         print("[!] 'log' command not found. Are you on macOS?")
     except subprocess.TimeoutExpired:
@@ -246,16 +246,53 @@ def _classify_macos_line(line_lower: str) -> Tuple[Optional[str], Optional[str]]
 
 
 def _extract_user_macos(line: str) -> str:
+    """
+    Extract username from macOS log lines.
+    Handles many different formats that macOS uses.
+    """
     patterns = [
+        # SSH: "Failed password for root from 1.2.3.4"
+        # SSH: "Failed password for invalid user bob from 1.2.3.4"
         r"for (?:invalid user )?(\S+) from",
-        r"for user (\S+)",
+
+        # sudo: "sudo:     jyoti : TTY=ttys001 ; USER=root"
+        r"sudo:\s+(\S+)\s+:",
+
+        # su: "su: alice to root"
+        r"su:\s+(\S+)\s+to",
+
+        # PAM: "pam_unix(sudo:session): session opened for user root by jyoti"
+        r"session opened for user \S+ by (\S+)",
+
+        # PAM: "pam_unix(sshd:auth): authentication failure; user=bob"
         r"user=(\S+)",
+
+        # Generic: "for user alice"
+        r"for user (\S+)",
+
+        # macOS unified log: "USER=root ; COMMAND=/usr/bin/python3"
         r"USER=(\S+)",
+
+        # macOS: "authenticating as user jyoti"
+        r"authenticating as (?:user )?(\S+)",
+
+        # macOS: "jyoti : command not allowed"
+        r"^[\w.]+\s+[\d:]+\s+\S+\s+sudo\[[\d]+\]:\s+(\S+)\s+:",
     ]
-    for p in patterns:
-        m = re.search(p, line, re.IGNORECASE)
+
+    for pattern in patterns:
+        m = re.search(pattern, line, re.IGNORECASE)
         if m:
-            return m.group(1)
+            username = m.group(1).strip()
+            # Filter out non-usernames that sometimes get caught
+            if username and username not in (
+                "TTY", "PWD", "USER", "COMMAND", "root", "NULL",
+                "failure", "error", "unknown", "none"
+            ):
+                return username
+            elif username == "root":
+                return "root"
+
     return ""
 
 

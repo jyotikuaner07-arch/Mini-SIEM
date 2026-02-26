@@ -24,7 +24,7 @@ except ImportError:
     print("[!] Click not installed. Run:  pip install click")
     sys.exit(1)
 
-from siem_logger import (
+from core.siem_logger import (
     setup_logging, log_startup, log_shutdown,
     log_alert_fired, log_live_cycle, log_error, get_recent_log_lines,
 )
@@ -68,7 +68,7 @@ def cli(ctx, log_level):
 @click.option("--email",      is_flag=True, help="Send email alerts (set env vars first)")
 @click.option("--no-report",  is_flag=True, help="Skip report file generation")
 @click.option("--no-db",      is_flag=True, help="Skip saving to SQLite database")
-@click.option("--output-dir", default=".",  help="Directory for output files")
+@click.option("--output-dir", default="reports",  help="Directory for output files")
 @click.pass_context
 def run(ctx, demo, live, interval, hours, email, no_report, no_db, output_dir):
     """
@@ -98,14 +98,14 @@ def _run_once(demo, hours, email, no_report, no_db, output_path):
     session_id = datetime.datetime.now().strftime("session_%Y%m%d_%H%M%S")
 
     if not no_db:
-        from database import init_db
+        from core.database import init_db
         init_db()
 
-    from threat_intel import load_threat_intel
+    from core.threat_intel import load_threat_intel
     load_threat_intel()
 
     click.echo("\n[1/4] " + click.style("Collecting logs...", fg="cyan"))
-    from collector import collect_logs
+    from core.collector import collect_logs
     raw_logs = collect_logs(hours_back=hours, demo_mode=demo)
     click.echo(f"      → {len(raw_logs)} raw entries collected.")
     if not raw_logs:
@@ -113,23 +113,47 @@ def _run_once(demo, hours, email, no_report, no_db, output_path):
         return
 
     click.echo("\n[2/4] " + click.style("Parsing & normalising...", fg="cyan"))
-    from parser import parse_all
+    from core.parser import parse_all
     events = parse_all(raw_logs)
+    click.echo(f"      → {len(events)} events parsed.")
+    if not events:
+        click.echo(click.style("[!] No valid events after parsing. Exiting.", fg="yellow"))
+        return
 
     click.echo("\n[3/4] " + click.style("Running detection engine...", fg="cyan"))
-    from detector import detect
+    from core.detector import detect
+    from core.whitelist import load_whitelist, filter_all_alerts
+    load_whitelist()
     events, alerts = detect(events)
-    for alert in alerts:
+
+# Split into real threats vs your own trusted activity
+    real_alerts, whitelisted_alerts = filter_all_alerts(alerts)
+
+# Log everything to siem.log (full audit trail preserved)
+    for alert in real_alerts:
         log_alert_fired(alert["rule"], alert["severity"],
-                        alert.get("entity",""), alert["risk_score"])
+                        alert.get("entity", ""), alert["risk_score"])
+    for alert in whitelisted_alerts:
+        log_alert_fired(alert["rule"], "INFO",
+                        alert.get("entity", ""), alert["risk_score"])
+
+# From this point forward, only work with real threats
+    alerts = real_alerts
+
+    if whitelisted_alerts:
+        click.echo(click.style(
+            f"      → {len(whitelisted_alerts)} alert(s) suppressed "
+            f"(your trusted activity — full audit trail preserved in DB)",
+        fg="yellow"
+    ))
 
     if not no_db:
-        from database import save_events, save_alerts
+        from core.database import save_events, save_alerts
         save_events(events, session_id)
         save_alerts(alerts, session_id)
 
     click.echo("\n[4/4] " + click.style("Dispatching alerts...", fg="cyan"))
-    from alert import print_all_alerts, save_alerts_to_file, send_email_alerts, email_config_from_env
+    from core.alert import print_all_alerts, save_alerts_to_file, send_email_alerts, email_config_from_env
     print_all_alerts(alerts)
     save_alerts_to_file(alerts, output_path / "alerts.txt")
     if email:
@@ -137,7 +161,7 @@ def _run_once(demo, hours, email, no_report, no_db, output_path):
 
     if not no_report:
         click.echo("\n" + click.style("[*] Generating reports...", fg="cyan"))
-        from report import build_report_data, generate_txt_report, generate_csv_report, generate_alerts_csv
+        from core.report import build_report_data, generate_txt_report, generate_csv_report, generate_alerts_csv
         data = build_report_data(events, alerts)
         generate_txt_report(data,  output_path / "security_report.txt")
         generate_csv_report(data,  output_path / "security_events.csv")
@@ -151,11 +175,11 @@ def _run_once(demo, hours, email, no_report, no_db, output_path):
 
 def _run_live(demo, hours, interval, email, no_db, output_path):
     """Continuously poll for new logs every `interval` seconds."""
-    from threat_intel import load_threat_intel
+    from core.threat_intel import load_threat_intel
     load_threat_intel()
 
     if not no_db:
-        from database import init_db
+        from core.database import init_db
         init_db()
 
     click.echo(click.style(
@@ -173,10 +197,10 @@ def _run_live(demo, hours, interval, email, no_db, output_path):
             click.echo(click.style(f"[{ts_str}] Cycle {cycle}", fg="blue"), nl=False)
 
             try:
-                from collector import collect_logs
-                from parser import parse_all
-                from detector import detect
-                from alert import print_all_alerts, save_alerts_to_file
+                from core.collector import collect_logs
+                from core.parser import parse_all
+                from core.detector import detect
+                from core.alert import print_all_alerts, save_alerts_to_file
 
                 raw_logs = collect_logs(hours_back=1, demo_mode=demo)
                 events   = parse_all(raw_logs)
@@ -192,7 +216,7 @@ def _run_live(demo, hours, interval, email, no_db, output_path):
                         print_all_alerts(alerts)
                         save_alerts_to_file(alerts, output_path / "alerts.txt")
                         if not no_db:
-                            from database import save_events, save_alerts
+                            from core.database import save_events, save_alerts
                             save_events(new_evts, f"live_{cycle}")
                             save_alerts(alerts, f"live_{cycle}")
                         for a in alerts:
@@ -228,7 +252,7 @@ def dashboard(host, port, demo):
         python main.py dashboard --demo
         python main.py dashboard --port 8080
     """
-    from threat_intel import load_threat_intel
+    from core.threat_intel import load_threat_intel
     load_threat_intel()
 
     events, alerts = [], []
@@ -238,7 +262,7 @@ def dashboard(host, port, demo):
     else:
         try:
             import datetime as dt
-            from database import init_db, query_events, query_alerts
+            from core.database import init_db, query_events, query_alerts
             init_db()
             since = (dt.datetime.now() - dt.timedelta(hours=24)).isoformat()
 
@@ -270,16 +294,16 @@ def dashboard(host, port, demo):
             events, alerts = _load_demo_data()
 
     try:
-        from dashboard import run_dashboard
+        from core.dashboard import run_dashboard
         run_dashboard(events, alerts, host=host, port=port)
     except ImportError:
         click.echo(click.style("[!] Flask not installed. Run:  pip install flask", fg="red"))
 
 
 def _load_demo_data():
-    from collector import generate_demo_logs
-    from parser import parse_all
-    from detector import detect
+    from core.collector import generate_demo_logs
+    from core.parser import parse_all
+    from core.detector import detect
     raw = generate_demo_logs()
     events = parse_all(raw)
     events, alerts = detect(events)
@@ -312,7 +336,7 @@ def query(ip, user, event_type, since, limit, show_alerts):
         python main.py query --alerts (show all recent alerts)
     """
     try:
-        from database import init_db, query_events, query_alerts
+        from core.database import init_db, query_events, query_alerts
         init_db()
     except Exception as exc:
         click.echo(f"[!] DB error: {exc}")
@@ -367,7 +391,7 @@ def query(ip, user, event_type, since, limit, show_alerts):
 def stats():
     """Show database statistics and threat intel summary."""
     try:
-        from database import init_db, get_db_stats, get_top_ips, get_top_targeted_users
+        from core.database import init_db, get_db_stats, get_top_ips, get_top_targeted_users
         init_db()
         db        = get_db_stats()
         top_ips   = get_top_ips(5)
@@ -376,7 +400,7 @@ def stats():
         click.echo(f"[!] DB error: {exc}")
         return
 
-    from threat_intel import load_threat_intel, get_intel_stats
+    from core.threat_intel import load_threat_intel, get_intel_stats
     load_threat_intel()
     ti = get_intel_stats()
 

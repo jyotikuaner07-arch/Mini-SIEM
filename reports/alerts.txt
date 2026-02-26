@@ -174,3 +174,69 @@ Session: 2026-02-25T17:22:57.533350
 [CRITICAL] 2026-02-25 17:22:57 | Rule: CRITICAL_RISK_THRESHOLD | Score: 279
   Aggregate risk score 279 exceeds critical threshold 20. Immediate investigation recommended.
 
+
+============================================================
+Session: 2026-02-25T20:09:08.043805
+============================================================
+[HIGH] 2026-02-25 05:46:13 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-25 19:58:57 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[CRITICAL] 2026-02-25 19:59:02 | Rule: CRITICAL_RISK_THRESHOLD | Score: 30
+  Aggregate risk score 30 exceeds critical threshold 20. Immediate investigation recommended.
+
+
+============================================================
+Session: 2026-02-26T09:02:13.574131
+============================================================
+[HIGH] 2026-02-25 19:58:57 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-26 01:59:31 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-26 07:59:06 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[CRITICAL] 2026-02-26 08:03:16 | Rule: CRITICAL_RISK_THRESHOLD | Score: 45
+  Aggregate risk score 45 exceeds critical threshold 20. Immediate investigation recommended.
+
+
+============================================================
+Session: 2026-02-26T09:39:44.659800
+============================================================
+[HIGH] 2026-02-25 19:58:57 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-26 01:59:31 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-26 07:59:06 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[CRITICAL] 2026-02-26 08:03:16 | Rule: CRITICAL_RISK_THRESHOLD | Score: 45
+  Aggregate risk score 45 exceeds critical threshold 20. Immediate investigation recommended.
+
+
+============================================================
+Session: 2026-02-26T11:13:57.207327
+============================================================
+[HIGH] 2026-02-25 19:58:57 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-26 01:59:31 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[HIGH] 2026-02-26 07:59:06 | Rule: PRIVILEGE_ESCALATION | Score: 5
+  Privilege escalation detected — user: ?, ip: N/A, status: INFO
+
+[CRITICAL] 2026-02-26 08:03:16 | Rule: CRITICAL_RISK_THRESHOLD | Score: 45
+  Aggregate risk score 45 exceeds critical threshold 20. Immediate investigation recommended.
+
+
+============================================================
+Session: 2026-02-26T12:52:53.017744
+============================================================
+No alerts generated.
