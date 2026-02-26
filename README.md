@@ -134,6 +134,12 @@ Then open your browser and go to `http://127.0.0.1:5000`
 ### `run` — Analyse logs and fire alerts
 
 ```bash
+# Go to project folder
+cd ~/Desktop/log_monitor
+
+# Activate the vnev
+source venv/bin/activate
+
 # Demo mode (safe, works without admin)
 python3 main.py run --demo
 
