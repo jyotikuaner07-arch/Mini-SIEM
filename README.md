@@ -1,5 +1,10 @@
 # 🛡️ Mini SIEM
 
+[![PyPI version](https://badge.fury.io/py/mini-siem.svg)](https://badge.fury.io/py/mini-siem)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)](https://pypi.org/project/mini-siem/)
+
 > A pip-installable, cross-platform Security Information & Event Management (SIEM) tool built in Python.
 > Collects real system logs on **macOS, Windows, and Linux**, detects threats in real time,
 > stores everything in a database, and displays it all on a password-protected web dashboard.
