@@ -1,8 +1,8 @@
 # 🛡️ Mini SIEM
 
 > A pip-installable, cross-platform Security Information & Event Management (SIEM) tool built in Python.
-> Collects real macOS system logs, detects threats in real time, stores everything in a database,
-> and displays it all on a password-protected web dashboard.
+> Collects real system logs on **macOS, Windows, and Linux**, detects threats in real time,
+> stores everything in a database, and displays it all on a password-protected web dashboard.
 
 Inspired by enterprise tools like **Splunk**, **IBM QRadar**, and **Microsoft Sentinel** —
 built from scratch using only Python and distributed as a proper CLI package.
@@ -60,7 +60,7 @@ Mini SIEM/
 │   ├── main.py                 ← CLI entry point (all commands live here)
 │   └── core/                   ← engine modules
 │       ├── __init__.py
-│       ├── collector.py        ← macOS log collection
+│       ├── collector.py        ← macOS, Windows & Linux log collection
 │       ├── parser.py           ← normalisation & validation
 │       ├── detector.py         ← 6 detection rules + risk scoring
 │       ├── alert.py            ← console, file, email alerts
@@ -99,13 +99,36 @@ Mini SIEM/
 
 ---
 
+## 💻 Platform Support
+
+| Feature | macOS | Windows | Linux |
+|---|---|---|---|
+| `mini-siem run --demo` | ✅ | ✅ | ✅ |
+| Real log collection | ✅ | ✅ | ✅ |
+| Web dashboard | ✅ | ✅ | ✅ |
+| Database & queries | ✅ | ✅ | ✅ |
+| Threat intelligence | ✅ | ✅ | ✅ |
+| Whitelist suppression | ✅ | ✅ | ✅ |
+| Email alerts | ✅ | ✅ | ✅ |
+| Docker | ✅ | ✅ | ✅ |
+| Tests | ✅ | ✅ | ✅ |
+
+**Log sources by platform:**
+
+| Platform | Log Source | Admin Required |
+|---|---|---|
+| macOS | `log show` unified logging + `/var/log/system.log` | `sudo` |
+| Windows | Windows Event Log (IDs 4624, 4625, 4672, 4740) | Run as Administrator |
+| Linux (Ubuntu/Debian/Kali) | `/var/log/auth.log` | `sudo` |
+| Linux (CentOS/RHEL/Fedora) | `/var/log/secure` | `sudo` |
+
+---
+
 ## 🍎 Installation on macOS
 
 ### Requirements
 - Python 3.10 or higher
 - macOS Monterey, Ventura, or Sonoma
-
-### Install from source (development)
 
 ```bash
 # Clone the repo
@@ -123,7 +146,7 @@ pip install .
 mini-siem init
 ```
 
-### Shortcut — add to your shell so venv activates automatically
+### Shortcut — activate venv automatically
 
 ```bash
 echo 'alias siem="cd ~/Documents/PROJECTS/Mini\ SIEM && source venv/bin/activate"' >> ~/.zshrc
@@ -134,17 +157,117 @@ Now just type `siem` in any terminal window to get started.
 
 ---
 
-## 🚀 Daily Usage (macOS)
+## 🪟 Installation on Windows
 
-### Every time you open Terminal
+### Requirements
+- Python 3.10 or higher — download from [python.org](https://python.org)
+- Run **Command Prompt as Administrator** for real log access
 
 ```bash
-siem                        # go to project + activate venv
-sudo mini-siem run          # collect real macOS logs
+# Clone the repo
+git clone https://github.com/yourusername/mini-SIEM.git
+cd mini-SIEM
+
+# Create and activate virtual environment
+python -m venv venv
+venv\Scripts\activate
+
+# Install the package + Windows log support
+pip install .
+pip install pywin32
+
+# First time setup
+mini-siem init
+```
+
+### Real log collection on Windows
+
+Open **Command Prompt as Administrator** (right-click → Run as Administrator):
+
+```bash
+mini-siem run
+```
+
+Without Administrator rights, use demo mode:
+```bash
+mini-siem run --demo
+```
+
+**What gets detected from Windows Event Log:**
+
+| Event ID | What It Means |
+|---|---|
+| 4625 | Failed login attempt |
+| 4624 | Successful login |
+| 4740 | Account lockout |
+| 4672 | Privilege escalation |
+
+---
+
+## 🐧 Installation on Linux
+
+### Requirements
+- Python 3.10 or higher
+- Ubuntu, Debian, Kali, CentOS, RHEL, or Fedora
+
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/mini-SIEM.git
+cd mini-SIEM
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install the package
+pip install .
+
+# First time setup
+mini-siem init
+```
+
+### Real log collection on Linux
+
+```bash
+# Ubuntu / Debian / Kali — reads /var/log/auth.log
+sudo mini-siem run
+
+# CentOS / RHEL / Fedora — reads /var/log/secure
+sudo mini-siem run
+```
+
+**What gets detected from Linux logs:**
+- SSH brute-force attempts (`Failed password for root from 1.2.3.4`)
+- Invalid user login attempts
+- Sudo usage and privilege escalation
+- Account authentication failures
+
+---
+
+## 🚀 Daily Usage
+
+### macOS
+```bash
+siem                        # activate venv (if alias set up)
+sudo mini-siem run          # collect real logs
 mini-siem dashboard         # open web dashboard
 ```
 
-Then visit `http://127.0.0.1:5000` — login: `admin` / `siem2025`
+### Windows (Command Prompt as Administrator)
+```bash
+venv\Scripts\activate
+mini-siem run               # collect real Windows Event Log
+mini-siem dashboard         # open web dashboard
+```
+
+### Linux
+```bash
+source venv/bin/activate
+sudo mini-siem run          # collect real logs
+mini-siem dashboard         # open web dashboard
+```
+
+Then visit `http://localhost:5000` — login: `admin` / `siem2025`
 
 ---
 
@@ -159,10 +282,16 @@ mini-siem init
 ### `mini-siem run` — Analyse logs and fire alerts
 
 ```bash
-# Real macOS logs (requires sudo)
+# Real logs — macOS (requires sudo)
 sudo mini-siem run
 
-# Demo mode — simulated logs, no sudo needed
+# Real logs — Windows (run Command Prompt as Administrator)
+mini-siem run
+
+# Real logs — Linux (requires sudo)
+sudo mini-siem run
+
+# Demo mode — works on ALL platforms, no admin needed
 mini-siem run --demo
 
 # Look back further in time
@@ -431,40 +560,52 @@ docker run -p 5000:5000 -v ~/.mini_siem:/root/.mini_siem mini-siem
 
 ---
 
-## 🍎 macOS Log Collection
+## 🔎 Real Log Collection by Platform
 
-Real log collection uses two macOS sources:
+### 🍎 macOS
+Uses two sources: the `log show` unified logging command and `/var/log/system.log`.
 
-**`log show` command** — macOS unified logging. Captures authentication
-failures, SSH events, sudo usage, and privilege escalation.
-
-**`/var/log/system.log`** — Traditional syslog fallback.
-
-**Sudo is required for real logs:**
 ```bash
 sudo mini-siem run
 ```
 
-Without sudo, the tool automatically falls back to demo mode.
+Give Terminal **Full Disk Access** if you get zero events:
+System Settings → Privacy & Security → Full Disk Access → add Terminal
 
-**What gets detected from real macOS logs:**
-- SSH brute-force attempts
-- Failed password events
-- Sudo / privilege escalation
-- Invalid user login attempts
-- Account lockouts
-
-**Generate real test events:**
+**Generate test events:**
 ```bash
-# In a second Terminal window
-ssh wronguser@localhost      # creates failed login entries
-sudo ls                      # creates privilege escalation entry
-sudo whoami
+ssh wronguser@localhost     # failed login
+sudo ls                     # privilege escalation
 ```
 
-Then scan:
+### 🪟 Windows
+Reads Windows Event Log via `pywin32`. Install it first:
 ```bash
-sudo mini-siem run --hours 1
+pip install pywin32
+```
+
+Then open Command Prompt **as Administrator** and run:
+```bash
+mini-siem run
+```
+
+**Generate test events:**
+```
+Lock your screen and type wrong password → Event ID 4625
+Open an elevated command prompt → Event ID 4672
+```
+
+### 🐧 Linux
+Reads `/var/log/auth.log` (Ubuntu/Debian/Kali) or `/var/log/secure` (CentOS/RHEL).
+
+```bash
+sudo mini-siem run
+```
+
+**Generate test events:**
+```bash
+ssh wronguser@localhost     # failed login → goes to auth.log
+sudo ls                     # privilege escalation
 ```
 
 ---
@@ -477,21 +618,24 @@ python -m build
 ```
 
 Creates in `dist/`:
-- `mini_siem-1.0.0.tar.gz` — source distribution
-- `mini_siem-1.0.0-py3-none-any.whl` — installable wheel
+- `mini_siem-1.1.0.tar.gz` — source distribution
+- `mini_siem-1.1.0-py3-none-any.whl` — installable wheel
 
 Install from wheel:
 ```bash
-pip install mini_siem-1.0.0-py3-none-any.whl
+pip install mini_siem-1.1.0-py3-none-any.whl
+
+# Windows users — also install pywin32 for real log support
+pip install pywin32
 ```
 
-Publish to PyPI (optional):
+Publish to PyPI:
 ```bash
 pip install twine
 twine upload dist/*
 ```
 
-Then anyone in the world can install with:
+Then anyone on any platform installs with:
 ```bash
 pip install mini-siem
 ```
@@ -502,28 +646,47 @@ pip install mini-siem
 
 **`mini-siem: command not found`**
 ```bash
+# macOS / Linux
 source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
 ```
 
 **Port 5000 already in use**
 ```bash
 mini-siem dashboard --port 8080
-# visit http://127.0.0.1:8080
+# visit http://localhost:8080
 ```
 
-**Zero events collected (no sudo)**
+**Zero events on macOS (even with sudo)**
+- System Settings → Privacy & Security → Full Disk Access → add Terminal → restart Terminal
+
+**Zero events on Windows**
+- Make sure you opened Command Prompt as Administrator
+- Right-click Command Prompt → Run as Administrator
+
+**Zero events on Linux**
 ```bash
+# Check which log file exists on your distro
+ls /var/log/auth.log    # Ubuntu/Debian/Kali
+ls /var/log/secure      # CentOS/RHEL/Fedora
 sudo mini-siem run
 ```
 
-**Zero events even with sudo**
-- Go to System Settings → Privacy & Security → Full Disk Access
-- Add Terminal and enable it
-- Restart Terminal and try again
+**Windows: `No module named win32evtlog`**
+```bash
+pip install pywin32
+```
 
 **Database issues**
 ```bash
-rm ~/.mini_siem/siem.db
+rm ~/.mini_siem/siem.db    # macOS / Linux
+mini-siem init
+```
+```bash
+# Windows — in Command Prompt
+del %USERPROFILE%\.mini_siem\siem.db
 mini-siem init
 ```
 
@@ -533,6 +696,9 @@ pip uninstall mini-siem -y
 pip install .
 ```
 
+**Dashboard shows "Access Denied" in Chrome**
+Use Safari or Firefox, or type `http://localhost:5000` with `http://` explicitly.
+
 ---
 
 ## 📚 Concepts This Project Demonstrates
@@ -541,7 +707,9 @@ pip install .
 |---|---|
 | pip package distribution | `pyproject.toml`, `mini_siem/` structure |
 | CLI design | Click framework, `mini_siem/main.py` |
-| macOS log collection | `core/collector.py` |
+| macOS log collection | `core/collector.py` — `log show` + `/var/log/system.log` |
+| Windows log collection | `core/collector.py` — Windows Event Log via `pywin32` |
+| Linux log collection | `core/collector.py` — `/var/log/auth.log` + `/var/log/secure` |
 | Log parsing & normalisation | `core/parser.py` |
 | Rule-based threat detection | `core/detector.py` |
 | Risk scoring | Numerical danger scores per event |
@@ -565,4 +733,4 @@ Free to use, modify, and distribute. Keep the copyright notice.
 ---
 
 *Built as a portfolio project demonstrating defensive security engineering.*
-*Inspired by Splunk, IBM QRadar, and Microsoft Sentinel.*
+*Supports macOS, Windows, and Linux. Inspired by Splunk, IBM QRadar, and Microsoft Sentinel.*
