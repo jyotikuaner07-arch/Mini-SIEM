@@ -41,7 +41,7 @@ USER_DATA_DIR = Path.home() / ".mini_siem"
 # ════════════════════════════════════════════════════════
 
 @click.group()
-@click.version_option(version="1.0.0", prog_name="mini-siem")
+@click.version_option(version="1.1.0", prog_name="mini-siem")
 @click.option(
     "--log-level",
     default="INFO",

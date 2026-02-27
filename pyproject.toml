@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mini-siem"
-version = "1.0.0"
+version = "1.1.0"
 description = "A pip-installable cross-platform SIEM CLI tool with real-time threat detection"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -27,6 +27,7 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -48,10 +49,8 @@ dependencies = [
 # ── Optional dependencies ──
 # Install with:  pip install mini-siem[dev]
 [project.optional-dependencies]
-dev = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-]
+windows = ["pywin32>=306"]
+dev     = ["pytest>=7.4.0", "pytest-cov>=4.1.0"]
 
 # ── THIS IS THE KEY LINE ──
 # When user types 'mini-siem', Python runs the cli() function

@@ -18,85 +18,150 @@ SYSTEM = platform.system()  # 'Windows', 'Darwin', 'Linux'
 # WINDOWS COLLECTION
 # ──────────────────────────────────────────────
 
-'''def collect_windows_logs(hours_back: int = 24) -> list[dict]:
-    """
-    Collect Security Event Log entries from Windows using pywin32.
-    Focuses on Event IDs: 4625 (failed login), 4740 (lockout),
-    4648 (explicit credential use), 4672 (privilege escalation).
-    """
-    import platform
-
-# Detect OS
 def collect_windows_logs(hours_back: int = 24) -> list[dict]:
     """
-    Collect Security Event Log entries from Windows using pywin32.
-    Focuses on Event IDs: 4625 (failed login), 4740 (lockout),
-    4648 (explicit credential use), 4672 (privilege escalation).
+    Collect real logs from Windows Event Log.
+    Requires: pip install pywin32
+    Run as Administrator for full access.
+    
+    Event IDs:
+        4625 = Failed login
+        4624 = Successful login  
+        4740 = Account lockout
+        4672 = Privilege escalation
     """
-
-    if SYSTEM != "Windows":
+    try:
+        import win32evtlog      # type: ignore
+        import win32evtlogutil  # type: ignore
+        import win32con         # type: ignore
+    except ImportError:
+        print("[!] pywin32 not installed. Run: pip install pywin32")
         return []
 
-    from typing import TYPE_CHECKING
+    events      = []
+    cutoff      = datetime.datetime.now() - datetime.timedelta(hours=hours_back)
+    event_ids   = {4625, 4624, 4740, 4672}
+    server      = "localhost"
+    log_type    = "Security"
 
-    if TYPE_CHECKING:
-        import win32evtlog
-        import win32con
-
-    TARGET_IDS = {4625, 4740, 4648, 4672, 4624}
-    events = []
-    cutoff = datetime.datetime.now() - datetime.timedelta(hours=hours_back)
-
-    server = None
-    log_type = "Security"
-    handle = win32evtlog.OpenEventLog(server, log_type)
-    flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
+    EVENT_TYPE_MAP = {
+        4625: ("FAILED_LOGIN",         "FAILED"),
+        4624: ("SUCCESSFUL_LOGIN",     "SUCCESS"),
+        4740: ("ACCOUNT_LOCKOUT",      "FAILED"),
+        4672: ("PRIVILEGE_ESCALATION", "INFO"),
+    }
 
     try:
+        hand = win32evtlog.OpenEventLog(server, log_type)
+        flags = win32evtlog.EVENTLOG_BACKWARDS_READ | win32evtlog.EVENTLOG_SEQUENTIAL_READ
+
         while True:
-            raw_events = win32evtlog.ReadEventLog(handle, flags, 0)
-            if not raw_events:
+            records = win32evtlog.ReadEventLog(hand, flags, 0)
+            if not records:
                 break
+            for rec in records:
+                if rec.EventID not in event_ids:
+                    continue
+                ts = rec.TimeGenerated
+                if isinstance(ts, str):
+                    try:
+                        ts = datetime.datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+                    except Exception:
+                        continue
+                if ts < cutoff:
+                    return events  # records are newest first
+                event_type, status = EVENT_TYPE_MAP.get(
+                    rec.EventID, ("UNKNOWN", "UNKNOWN")
+                )
+                try:
+                    strings = rec.StringInserts or []
+                    user    = strings[5] if len(strings) > 5 else ""
+                    ip      = strings[18] if len(strings) > 18 else ""
+                    if ip in ("-", "", None):
+                        ip = ""
+                except Exception:
+                    user, ip = "", ""
 
-            for ev in raw_events:
-                ts = ev.TimeGenerated
-                if hasattr(ts, "timestamp"):
-                    event_time = datetime.datetime.fromtimestamp(ts.timestamp())
-                else:
-                    event_time = datetime.datetime(*ts.timetuple()[:6])
+                events.append({
+                    "_raw_source": "windows_event_log",
+                    "timestamp":   ts.isoformat(),
+                    "event_id":    rec.EventID,
+                    "event_type":  event_type,
+                    "user":        user.strip() if user else "",
+                    "source_ip":   ip.strip()   if ip   else "",
+                    "status":      status,
+                    "raw_message": f"EventID={rec.EventID} User={user} IP={ip}",
+                })
 
-                if event_time < cutoff:
-                    return events
+        win32evtlog.CloseEventLog(hand)
 
-                eid = ev.EventID & 0x1FFFFFFF
-                if eid in TARGET_IDS:
-                    strings = ev.StringInserts or []
-                    events.append({
-                        "_raw_source": "windows_event_log",
-                        "timestamp": event_time.isoformat(),
-                        "event_id": eid,
-                        "event_type": _windows_event_type(eid),
-                        "user": strings[5] if len(strings) > 5 and eid == 4625 else (strings[1] if len(strings) > 1 else ""),
-                        "source_ip": strings[19] if len(strings) > 19 and eid == 4625 else "",
-                        "status": "FAILED" if eid == 4625 else "INFO",
-                        "raw_strings": list(strings),
-                    })
-
-    finally:
-        win32evtlog.CloseEventLog(handle)
+    except Exception as exc:
+        print(f"[!] Windows Event Log error: {exc}")
+        print("[!] Try running as Administrator.")
 
     return events
 
+# ──────────────────────────────────────────────
+# Linux COLLECTION
+# ──────────────────────────────────────────────
 
-def _windows_event_type(eid: int) -> str:
-    return {
-        4625: "FAILED_LOGIN",
-        4740: "ACCOUNT_LOCKOUT",
-        4648: "EXPLICIT_CRED_LOGIN",
-        4672: "PRIVILEGE_ESCALATION",
-        4624: "SUCCESSFUL_LOGIN",
-    }.get(eid, "UNKNOWN")'''
+def collect_linux_logs(hours_back: int = 24) -> list[dict]:
+    """
+    Collect logs from Linux systems.
+    Reads from /var/log/auth.log (Ubuntu/Debian/Kali)
+    or /var/log/secure (CentOS/RHEL/Fedora)
+    """
+    events   = []
+    cutoff   = datetime.datetime.now() - datetime.timedelta(hours=hours_back)
+    year     = datetime.datetime.now().year
 
+    # Different distros store auth logs in different places
+    for log_path in [
+        Path("/var/log/auth.log"),   # Ubuntu, Debian, Kali
+        Path("/var/log/secure"),     # CentOS, RHEL, Fedora
+        Path("/var/log/messages"),   # older systems
+    ]:
+        if log_path.exists():
+            break
+    else:
+        print("[!] No Linux auth log found. Try running with sudo.")
+        return []
+
+    try:
+        with open(log_path, "r", errors="replace") as f:
+            for line in f:
+                m = re.match(r"^(\w{3}\s+\d+\s+\d{2}:\d{2}:\d{2})", line)
+                if not m:
+                    continue
+                try:
+                    ts = datetime.datetime.strptime(
+                        f"{year} {m.group(1)}", "%Y %b %d %H:%M:%S"
+                    )
+                except ValueError:
+                    continue
+                if ts < cutoff:
+                    continue
+
+                line_lower    = line.lower()
+                event_type, status = _classify_macos_line(line_lower)
+                if not event_type:
+                    continue
+
+                events.append({
+                    "_raw_source": f"linux_{log_path.name}",
+                    "timestamp":   ts.isoformat(),
+                    "event_id":    None,
+                    "event_type":  event_type,
+                    "user":        _extract_user_macos(line),
+                    "source_ip":   _extract_ip(line),
+                    "status":      status,
+                    "raw_message": line.strip(),
+                })
+
+    except PermissionError:
+        print(f"[!] Permission denied reading {log_path}. Run with sudo.")
+
+    return events
 
 # ──────────────────────────────────────────────
 # macOS COLLECTION
@@ -389,18 +454,16 @@ def generate_demo_logs() -> list[dict]:
 # PUBLIC API
 # ──────────────────────────────────────────────
 
-def collect_logs(hours_back: int = 24, demo_mode: bool = False) -> List[Dict]:
-    """
-    Main entry point. Collects logs based on current OS.
-    Falls back to demo mode if platform not supported or demo_mode=True.
-    """
+def collect_logs(hours_back: int = 24, demo_mode: bool = False) -> list[dict]:
     if demo_mode:
-        print("[*] Running in DEMO mode — using simulated log data.")
         return generate_demo_logs()
 
-    print(f"[*] Detected OS: {SYSTEM}")
     if SYSTEM == "Darwin":
         return collect_macos_logs(hours_back)
+    elif SYSTEM == "Windows":
+        return collect_windows_logs(hours_back)
+    elif SYSTEM == "Linux":
+        return collect_linux_logs(hours_back)
     else:
-        print(f"[!] Platform '{SYSTEM}' not natively supported. Switching to demo mode.")
+        print(f"[!] Unknown OS '{SYSTEM}' — using demo mode.")
         return generate_demo_logs()
